@@ -8,6 +8,7 @@ router.get("/", function(req, res, next) {
   res.render("index", { title: "Express" });
 });
 
+// Route for Gupshup Inbound Messages
 router.post("/callback", function(req, res) {
   const {botname, messageobj} = req.body;
   console.log("App Name: ", botname);
@@ -16,6 +17,7 @@ router.post("/callback", function(req, res) {
   res.sendStatus(200);
 });
 
+// Route for Gupshup Outbound Messages
 router.get("/msg", async function(req, res) {
 
   const payload = {
