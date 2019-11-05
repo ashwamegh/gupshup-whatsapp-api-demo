@@ -1,6 +1,7 @@
-var express = require("express");
-var router = express.Router();
-var fetch = require("node-fetch");
+const express = require("express");
+const router = express.Router();
+const Axios = require('axios');
+const querystring = require('querystring');
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
@@ -8,38 +9,32 @@ router.get("/", function(req, res, next) {
 });
 
 router.post("/callback", function(req, res) {
-  const data = req.body;
-  console.log(data);
+  const {botname, messageobj} = req.body;
+  console.log("App Name: ", botname);
+  console.log("Message Object: ", JSON.parse(messageobj));
   // console.log(data.text);
   res.sendStatus(200);
 });
 
-router.get("/msg", function(req, res) {
-  
-  fetch("https://api.gupshup.io/sm/api/v1/msg", {
-    credentials: "include",
-    headers: {
-      accept: "application/json, text/plain, */*",
-      apikey: "faefecf791f34cc8cce8976357a15f57",
-      authorization: "faefecf791f34cc8cce8976357a15f57",
-      "content-type": "application/x-www-form-urlencoded",
-      "sec-fetch-mode": "cors"
-    },
-    body:
-      "channel=whatsapp&source=917834811114&destination=918587099540&message=fromngrok",
-    method: "POST",
-    mode: "cors"
-  })
-  .then(response => response.json())
-  .then(json => { 
-    console.log(json);
-    res.json(json);
-  });
-})
+router.get("/msg", async function(req, res) {
 
-router.post("/twilio", (req,res) => {
-  console.log(req.body);
-  res.json(req.body);
+  const payload = {
+    channel: 'whatsapp',
+    source: "Demo from Github",
+    destination: "917834811114",
+    message: "918587099540",
+  };
+  const gupshupResponse = await Axios.create({
+    headers: {
+      accept: 'application/json, text/plain, */*',
+      apikey: process.env.API_KEY,
+      'content-type': 'application/x-www-form-urlencoded',
+      'Cache-Control': 'no-cache',
+      'cache-control': 'no-cache',
+    },
+  }).post('https://api.gupshup.io/sm/api/v1/msg', querystring.stringify(payload));
+
+  res.status(200).send(gupshupResponse.data);
 })
 
 module.exports = router;
